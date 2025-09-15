@@ -43,16 +43,16 @@
         RESULTADOS:
         
         Função f1 (Distância Total):
-        - Mínimo: 1299.62
-        - Máximo: 1618.82
-        - Média: 1412.86
-        - Desvio Padrão: 118.30
+        - Mínimo: 1223.24
+        - Máximo: 1450.63
+        - Média: 1354.46
+        - Desvio Padrão: 75.84
         
         Função f2 (Diferença entre Equipes):
         - Mínimo: 3.00
-        - Máximo: 13.00
-        - Média: 8.80
-        - Desvio Padrão: 3.71
+        - Máximo: 14.00
+        - Média: 7.40
+        - Desvio Padrão: 3.67
         
         ========================================
         
