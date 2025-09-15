@@ -1,0 +1,58 @@
+
+        ========================================
+        MODELAGEM E OTIMIZAÇÃO MONO-OBJETIVO
+        ========================================
+        
+        PROBLEMA:
+        - Ativos: 125
+        - Bases: 14
+        - Equipes máximas: 8
+        - η (percentual mínimo): 0.2
+        
+        MODELAGEM MATEMÁTICA:
+        
+        Variáveis:
+        - x_ij ∈ {0,1}: Ativo i atribuído à base j
+        - y_jk ∈ {0,1}: Base j ocupada pela equipe k  
+        - h_ik ∈ {0,1}: Ativo i mantido pela equipe k
+        
+        Funções Objetivo:
+        - f1 = Σᵢ Σⱼ dᵢⱼ xᵢⱼ (minimizar distância total)
+        - f2 = max_k(Σᵢ hᵢₖ) - min_k(Σᵢ hᵢₖ) (minimizar diferença entre equipes)
+        
+        Restrições:
+        1. Σⱼ yⱼₖ = 1, ∀k (cada equipe em exatamente uma base)
+        2. Σⱼ xᵢⱼ = 1, ∀i (cada ativo em exatamente uma base)
+        3. xᵢⱼ ≤ yⱼₖ, ∀i,j,k (ativo só em base com equipe)
+        4. Σₖ hᵢₖ = 1, ∀i (cada ativo em exatamente uma equipe)
+        5. hᵢₖ ≤ (xᵢⱼ + yⱼₖ)/2, ∀i,j,k (ativo só em equipe da sua base)
+        6. Σᵢ hᵢₖ ≥ η·n/s, ∀k (equilíbrio mínimo)
+        
+        ALGORITMO VNS:
+        
+        Estruturas de Vizinhança:
+        1. Troca ativo de base
+        2. Troca equipe de base  
+        3. Troca ativo entre equipes da mesma base
+        
+        Heurística Construtiva:
+        1. Aloca equipes às bases mais centrais
+        2. Atribui ativos às bases mais próximas com equipes
+        3. Balanceia atribuição de ativos às equipes
+        
+        RESULTADOS:
+        
+        Função f1 (Distância Total):
+        - Mínimo: 1299.62
+        - Máximo: 1618.82
+        - Média: 1412.86
+        - Desvio Padrão: 118.30
+        
+        Função f2 (Diferença entre Equipes):
+        - Mínimo: 3.00
+        - Máximo: 13.00
+        - Média: 8.80
+        - Desvio Padrão: 3.71
+        
+        ========================================
+        
