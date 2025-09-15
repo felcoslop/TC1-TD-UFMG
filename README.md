@@ -2,8 +2,6 @@
 ## ENTREGA #1: Modelagem Matemática e Otimização Mono-Objetivo
 
 [![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://python.org)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Status](https://img.shields.io/badge/Status-Complete-success.svg)]()
 
 > **Algoritmo VNS para otimização de alocação de equipes de manutenção em bases estratégicas**
 
@@ -135,31 +133,6 @@ python -c "from src.funcoes_objetivo import FuncoesObjetivo; print('Módulo de f
 
 ---
 
-## 🏗️ **Arquitetura Modular**
-
-### **Módulos do Sistema**
-
-| Módulo | Responsabilidade | Linhas | Descrição |
-|--------|------------------|--------|-----------|
-| `monitoramento_ativos_base.py` | Classe principal | ~100 | Orquestração geral e função main |
-| `dados.py` | Processamento de dados | ~100 | Carregamento CSV e cálculo de distâncias |
-| `solucoes_iniciais.py` | Heurísticas construtivas | ~150 | Geração de soluções iniciais |
-| `funcoes_objetivo.py` | Avaliação e restrições | ~80 | F1, F2 e verificação de viabilidade |
-| `busca_local.py` | Estruturas de vizinhança | ~400 | Vizinhanças e operadores de shake |
-| `algoritmos_vns.py` | Metaheurística VNS | ~200 | Algoritmo principal de otimização |
-| `visualizacao.py` | Gráficos e mapas | ~400 | Plotagem de resultados e análises |
-| `relatorios.py` | Documentação | ~80 | Geração de relatórios textuais |
-
-### **Vantagens da Modularização**
-
-- ✅ **Manutenibilidade**: Cada módulo tem responsabilidade única
-- ✅ **Testabilidade**: Módulos podem ser testados independentemente  
-- ✅ **Reutilização**: Componentes podem ser reutilizados em outros projetos
-- ✅ **Legibilidade**: Código mais organizado e fácil de entender
-- ✅ **Escalabilidade**: Fácil adicionar novas funcionalidades
-
----
-
 ## 📊 **Saídas Geradas**
 
 ### **Gráficos de Análise**
@@ -218,71 +191,5 @@ As funções F1 e F2 são **conflitantes**:
 - **F2 baixo** → F1 alto (poucas equipes, distâncias grandes)
 
 ---
-
-## 🎨 **Visualizações**
-
-### **Gráfico de Rede**
-- 🔴 **Pentágonos pretos com cruz**: Bases ocupadas (com equipes)
-- ⚪ **Pentágonos brancos**: Bases disponíveis (sem equipes)
-- 🔵 **Círculos azuis**: Ativos (equipamentos)
-- ➖ **Linhas**: Conexões ativo-base
-
-### **Curvas de Convergência**
-- **Eixo X**: Número de iterações
-- **Eixo Y**: Valor da função objetivo
-- **5 curvas**: Uma para cada execução estocástica
-
----
-
-## 📚 **Requisitos da ENTREGA #1**
-
-### **✅ Formulação Matemática**
-- [x] Parâmetros do problema
-- [x] Variáveis de decisão
-- [x] Funções objetivo (F1 e F2)
-- [x] Restrições do problema
-
-### **✅ Algoritmo de Solução**
-- [x] Metaheurística VNS adequada
-- [x] Modelagem computacional
-- [x] 3+ estruturas de vizinhança
-- [x] Heurística construtiva
-- [x] Estratégia de refinamento
-
-### **✅ Resultados da Otimização**
-- [x] Algoritmo implementado e funcionando
-- [x] 5 execuções estocásticas
-- [x] Curvas de convergência sobrepostas
-- [x] Figuras das melhores soluções
-
----
-
-## 🤝 **Contribuição**
-
-Este projeto foi desenvolvido para a disciplina de **Teoria da Decisão** como parte da ENTREGA #1. O código está otimizado para demonstração acadêmica e pode ser adaptado para problemas similares de otimização logística.
-
-### **Próximos Passos Sugeridos**
-1. Implementar otimização multi-objetivo
-2. Adicionar análise de sensibilidade
-3. Expandir para problemas de maior escala
-4. Integrar com sistemas de gestão empresarial
-
----
-
-## 📄 **Licença**
-
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
-
----
-
-## 👨‍💻 **Autor**
-
-Desenvolvido para a disciplina de **Teoria da Decisão** - ENTREGA #1
-
----
-
-<div align="center">
-
-**⭐ Se este projeto foi útil, considere dar uma estrela! ⭐**
 
 </div>
