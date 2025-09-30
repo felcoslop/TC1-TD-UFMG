@@ -1,23 +1,11 @@
-"""
-Módulo de estruturas de vizinhança e busca local
-para o problema de monitoramento de ativos.
-"""
-
 import numpy as np
 from typing import List, Tuple
 
 class BuscaLocal:
-    """
-    Classe responsável pelas estruturas de vizinhança e busca local.
-    """
+    # Classe que implementa as estruturas de vizinhança e busca local para melhorar soluções
     
     def __init__(self, monitoramento):
-        """
-        Inicializa a busca local.
-        
-        Args:
-            monitoramento: Instância da classe principal
-        """
+        # Pega os dados do problema da classe principal
         self.monitoramento = monitoramento
         self.n_ativos = monitoramento.n_ativos
         self.m_bases = monitoramento.m_bases
@@ -277,7 +265,7 @@ class BuscaLocal:
                     h_shake[i, equipes_na_nova_base[0]] = 1
         
         # Perturbação mais agressiva: move equipes para bases vazias (só para F2)
-        if intensidade > 0.7 and np.random.random() < 0.5:  # Mais frequente
+        if intensidade > 0.5 and np.random.random() < 0.8:  # Mais frequente e menos restritivo
             equipes_ativas = np.where(np.sum(y_shake, axis=0) > 0)[0]
             bases_vazias = np.where(np.sum(y_shake, axis=1) == 0)[0]
             
@@ -313,7 +301,10 @@ class BuscaLocal:
         ativos_teste = np.random.choice(self.n_ativos, n_testes, replace=False)
         
         for i in ativos_teste:
-            base_atual = np.where(x_ij[i, :] == 1)[0][0]
+            base_atual_idx = np.where(x_ij[i, :] == 1)[0]
+            if len(base_atual_idx) == 0:
+                continue
+            base_atual = base_atual_idx[0]
             
             # Testa apenas as 3 bases mais próximas
             bases_validas = np.where(np.sum(y_jk, axis=1) > 0)[0]
@@ -345,42 +336,87 @@ class BuscaLocal:
                                 x_ij, y_jk, h_ik = x_teste, y_jk, h_teste
                                 return x_ij, y_jk, h_ik, melhor_valor  # Retorna imediatamente quando encontra melhoria
         
-        # Adiciona busca local para trocas de equipes (importante para f2)
+        # Adiciona busca local para f2 - tenta remover equipes desnecessárias
         if funcao_objetivo == 'f2':
-            for _ in range(10):  # Testa algumas trocas de equipes
-                # Escolhe uma base com múltiplas equipes
-                bases_com_multiplas_equipes = []
-                for j in range(self.m_bases):
-                    equipes_base = np.where(y_jk[j, :] == 1)[0]
-                    if len(equipes_base) > 1:
-                        bases_com_multiplas_equipes.append(j)
+            # Tenta consolidar ativos em menos equipes
+            for _ in range(20):  # Testa mais consolidações
+                # Encontra equipes com poucos ativos
+                ativos_por_equipe = np.sum(h_ik, axis=0)
+                equipes_com_ativos = np.where(ativos_por_equipe > 0)[0]
                 
-                if bases_com_multiplas_equipes:
-                    base_escolhida = np.random.choice(bases_com_multiplas_equipes)
-                    equipes_base = np.where(y_jk[base_escolhida, :] == 1)[0]
+                if len(equipes_com_ativos) > 1:
+                    # Escolhe uma equipe com poucos ativos para tentar consolidar
+                    equipe_remover = equipes_com_ativos[np.argmin(ativos_por_equipe[equipes_com_ativos])]
+                    ativos_equipe_remover = np.where(h_ik[:, equipe_remover] == 1)[0]
                     
-                    # Escolhe dois ativos aleatórios da base
-                    ativos_base = np.where(x_ij[:, base_escolhida] == 1)[0]
-                    if len(ativos_base) >= 2:
-                        ativos_trocar = np.random.choice(ativos_base, 2, replace=False)
+                    if len(ativos_equipe_remover) > 0:
+                        # Tenta mover todos os ativos desta equipe para outra equipe da mesma base
+                        base_equipe_remover = np.where(y_jk[:, equipe_remover] == 1)[0][0]
+                        outras_equipes_base = np.where(y_jk[base_equipe_remover, :] == 1)[0]
+                        outras_equipes_base = outras_equipes_base[outras_equipes_base != equipe_remover]
                         
-                        h_teste = h_ik.copy()
-                        equipe1 = np.where(h_ik[ativos_trocar[0], :] == 1)[0][0]
-                        equipe2 = np.where(h_ik[ativos_trocar[1], :] == 1)[0][0]
-                        
-                        if equipe1 != equipe2:
-                            h_teste[ativos_trocar[0], equipe1] = 0
-                            h_teste[ativos_trocar[0], equipe2] = 1
-                            h_teste[ativos_trocar[1], equipe2] = 0
-                            h_teste[ativos_trocar[1], equipe1] = 1
+                        if len(outras_equipes_base) > 0:
+                            equipe_destino = outras_equipes_base[0]
                             
-                            if self.funcoes_objetivo.verificar_restricoes(x_ij, y_jk, h_teste):
-                                valor_teste = self.funcoes_objetivo.calcular_f2(h_teste, y_jk)
+                            # Cria solução de teste
+                            h_teste = h_ik.copy()
+                            y_teste = y_jk.copy()
+                            
+                            # Move ativos para a equipe destino
+                            for ativo in ativos_equipe_remover:
+                                h_teste[ativo, equipe_remover] = 0
+                                h_teste[ativo, equipe_destino] = 1
+                            
+                            # Remove a equipe da base
+                            y_teste[base_equipe_remover, equipe_remover] = 0
+                            
+                            if self.funcoes_objetivo.verificar_restricoes(x_ij, y_teste, h_teste):
+                                valor_teste = self.funcoes_objetivo.calcular_f2(h_teste, y_teste)
                                 
                                 if valor_teste < melhor_valor:
-                                    melhor_solucao = (x_ij.copy(), y_jk.copy(), h_teste.copy())
+                                    melhor_solucao = (x_ij.copy(), y_teste.copy(), h_teste.copy())
                                     melhor_valor = valor_teste
-                                    h_ik = h_teste
-                                    break
+                                    x_ij, y_jk, h_ik = x_ij, y_teste, h_teste
+                                    return x_ij, y_jk, h_ik, melhor_valor  # Retorna imediatamente
+                
+                # Tenta mover equipe inteira para uma base com outra equipe
+                if len(equipes_com_ativos) > 1:
+                    equipe_remover = equipes_com_ativos[np.argmin(ativos_por_equipe[equipes_com_ativos])]
+                    base_equipe_remover = np.where(y_jk[:, equipe_remover] == 1)[0][0]
+                    ativos_equipe_remover = np.where(h_ik[:, equipe_remover] == 1)[0]
+                    
+                    # Encontra outras bases com equipes
+                    outras_bases = []
+                    for j in range(self.m_bases):
+                        if j != base_equipe_remover and np.sum(y_jk[j, :]) > 0:
+                            outras_bases.append(j)
+                    
+                    if len(outras_bases) > 0 and len(ativos_equipe_remover) > 0:
+                        base_destino = outras_bases[0]
+                        equipe_destino = np.where(y_jk[base_destino, :] == 1)[0][0]
+                        
+                        # Cria solução de teste
+                        h_teste = h_ik.copy()
+                        y_teste = y_jk.copy()
+                        x_teste = x_ij.copy()
+                        
+                        # Move ativos para a nova base e equipe
+                        for ativo in ativos_equipe_remover:
+                            h_teste[ativo, equipe_remover] = 0
+                            h_teste[ativo, equipe_destino] = 1
+                            x_teste[ativo, base_equipe_remover] = 0
+                            x_teste[ativo, base_destino] = 1
+                        
+                        # Remove a equipe da base original
+                        y_teste[base_equipe_remover, equipe_remover] = 0
+                        
+                        if self.funcoes_objetivo.verificar_restricoes(x_teste, y_teste, h_teste):
+                            valor_teste = self.funcoes_objetivo.calcular_f2(h_teste, y_teste)
+                            
+                            if valor_teste < melhor_valor:
+                                melhor_solucao = (x_teste.copy(), y_teste.copy(), h_teste.copy())
+                                melhor_valor = valor_teste
+                                x_ij, y_jk, h_ik = x_teste, y_teste, h_teste
+                                return x_ij, y_jk, h_ik, melhor_valor  # Retorna imediatamente
         
         return melhor_solucao[0], melhor_solucao[1], melhor_solucao[2], melhor_valor

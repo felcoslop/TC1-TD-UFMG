@@ -1,24 +1,12 @@
-"""
-Módulo de carregamento e processamento de dados
-para o problema de monitoramento de ativos.
-"""
-
 import numpy as np
 import pandas as pd
 from typing import Dict, Tuple
 
 class DadosProcessor:
-    """
-    Classe responsável pelo carregamento e processamento dos dados.
-    """
+    # Classe que carrega e processa os dados do arquivo CSV
     
     def __init__(self, arquivo_dados: str):
-        """
-        Inicializa o processador de dados.
-        
-        Args:
-            arquivo_dados: Caminho para o arquivo CSV com os dados
-        """
+        # Carrega os dados do arquivo CSV e calcula as distâncias entre ativos e bases
         self.arquivo_dados = arquivo_dados
         self.dados = self._carregar_dados(arquivo_dados)
         self.n_ativos = len(self.dados) if not self.dados.empty else 0

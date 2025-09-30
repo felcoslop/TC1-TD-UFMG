@@ -1,23 +1,11 @@
-"""
-Módulo de geração de soluções iniciais e heurísticas
-para o problema de monitoramento de ativos.
-"""
-
 import numpy as np
 from typing import List, Tuple
 
 class GeradorSolucoes:
-    """
-    Classe responsável pela geração de soluções iniciais e heurísticas.
-    """
+    # Classe que gera soluções iniciais para o problema usando heurísticas
     
     def __init__(self, monitoramento):
-        """
-        Inicializa o gerador de soluções.
-        
-        Args:
-            monitoramento: Instância da classe principal
-        """
+        # Pega os dados do problema da classe principal
         self.monitoramento = monitoramento
         self.n_ativos = monitoramento.n_ativos
         self.m_bases = monitoramento.m_bases
@@ -40,6 +28,7 @@ class GeradorSolucoes:
         h_ik = np.zeros((self.n_ativos, self.s_equipes), dtype=int)
         
         # Passo 1: Aloca equipes às bases (com randomização)
+        # Começa com todas as equipes alocadas para permitir otimização natural
         bases_ordenadas = self._ordenar_bases_por_centralidade()
         equipes_alocadas = min(self.s_equipes, self.m_bases)
         

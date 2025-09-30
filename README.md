@@ -1,195 +1,172 @@
-# 🚀 Otimização de Monitoramento de Ativos
-## ENTREGA #1: Modelagem Matemática e Otimização Mono-Objetivo
+# Otimização de Monitoramento de Ativos em Barragens de Mineração
 
-[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://python.org)
+> **Trabalho Computacional 1** - Engenharia de Sistemas UFMG  
+> *Algoritmos de Otimização e Metaheurísticas*
 
-> **Algoritmo VNS para otimização de alocação de equipes de manutenção em bases estratégicas**
+## Sobre o Projeto
 
----
+Imagine que você é responsável pela manutenção de 125 equipamentos críticos espalhados por uma região de mineração. Esses equipamentos precisam de manutenção regular, mas você tem um dilema: 
 
-## 📋 **Visão Geral**
+- **Usar poucas equipes** = economiza dinheiro, mas as equipes precisam percorrer distâncias enormes
+- **Usar muitas equipes** = reduz as distâncias, mas explode o orçamento
 
-Este projeto implementa uma solução de otimização para o problema de **monitoramento de ativos** utilizando a metaheurística **VNS (Variable Neighborhood Search)**. O objetivo é encontrar a melhor distribuição de equipes de manutenção entre bases disponíveis, considerando dois critérios conflitantes:
+Este projeto resolve exatamente esse problema usando inteligência computacional!
 
-- 🎯 **F1**: Minimizar distância total entre ativos e bases
-- 👥 **F2**: Minimizar número de equipes empregadas
+## O Que Este Projeto Faz
 
-### **Problema Real**
-Imagine uma empresa com **125 equipamentos** espalhados por uma região, **14 bases** disponíveis e capacidade para contratar até **8 equipes** de manutenção. Como organizar tudo de forma eficiente?
+Este trabalho implementa um **algoritmo VNS (Variable Neighborhood Search)** para resolver um problema de otimização multi-objetivo real do setor de mineração. O objetivo é encontrar o equilíbrio perfeito entre:
 
-**O conflito**: Usar poucas equipes economiza dinheiro, mas aumenta distâncias. Usar muitas equipes reduz distâncias, mas aumenta custos.
+- **f1**: Minimizar a distância total que as equipes precisam percorrer
+- **f2**: Minimizar o número de equipes necessárias
 
----
+### O Desafio Real
+- **125 ativos** espalhados geograficamente
+- **14 bases** operacionais disponíveis  
+- **Máximo 8 equipes** de manutenção
+- **Restrições práticas** de logística e operação
 
-## 📐 **Modelagem Matemática**
+> **Curiosidade**: Este é um problema real que empresas de mineração enfrentam diariamente!
 
-### **Otimização do Monitoramento de Ativos**
+## Modelagem Matemática
 
-**Objetivo:**
-```
-min f₁ = Σᵢ₌₁ⁿ Σⱼ₌₁ᵐ dᵢⱼ xᵢⱼ
-min f₂ = max_k(Σᵢ hᵢₖ) - min_k(Σᵢ hᵢₖ)
-```
+### Parâmetros do Problema
+- `n = 125` ativos a serem monitorados
+- `m = 14` bases operacionais disponíveis  
+- `s = 8` equipes máximas de manutenção
+- `η = 0.2` (20% - percentual mínimo de ativos por equipe)
+- `d_ij` = distância euclidiana entre ativo i e base j
 
-**Sujeito a:**
-```
-Σⱼ₌₁ᵐ yⱼₖ = 1,                    ∀k ∈ {1, ..., s}
-Σⱼ₌₁ᵐ xᵢⱼ = 1,                    ∀i ∈ {1, ..., n}
-xᵢⱼ ≤ yⱼₖ,                       ∀i ∈ {1, ..., n}, ∀j ∈ {1, ..., m}, ∀k ∈ {1, ..., s}
-Σₖ₌₁ˢ hᵢₖ = 1,                    ∀i ∈ {1, ..., n}
-hᵢₖ ≤ (xᵢⱼ + yⱼₖ)/2,              ∀i ∈ {1, ..., n}, ∀j ∈ {1, ..., m}, ∀k ∈ {1, ..., s}
-Σᵢ₌₁ⁿ hᵢₖ ≥ η · n/s,              ∀k ∈ {1, ..., s}
-```
+### Variáveis de Decisão
+- `x_ij ∈ {0,1}`: 1 se ativo i está na base j, 0 caso contrário
+- `y_jk ∈ {0,1}`: 1 se base j está ocupada pela equipe k, 0 caso contrário
+- `h_ik ∈ {0,1}`: 1 se ativo i está na equipe k, 0 caso contrário
 
-**Parâmetros:**
-- **n = 125**: Número de ativos
-- **m = 14**: Número de bases
-- **s = 8**: Número máximo de equipes
-- **η = 0.2**: Percentual mínimo de ativos por equipe
-- **dᵢⱼ**: Distância entre ativo i e base j
+### Funções Objetivo Conflitantes
+- **f1** = Σᵢ Σⱼ d_ij x_ij *(minimizar distância total)*
+- **f2** = S *(minimizar número de equipes utilizadas)*
 
-**Variáveis:**
-- **xᵢⱼ ∈ {0,1}**: Ativo i atribuído à base j
-- **yⱼₖ ∈ {0,1}**: Base j ocupada pela equipe k
-- **hᵢₖ ∈ {0,1}**: Ativo i mantido pela equipe k
+### Restrições Operacionais
+1. Cada equipe deve estar em exatamente uma base (se estiver sendo usada)
+2. Cada ativo deve estar em exatamente uma base
+3. Ativo só pode estar numa base se a base tiver pelo menos uma equipe
+4. Cada ativo deve estar em exatamente uma equipe
+5. Ativo só pode estar numa equipe se a equipe estiver na base do ativo
+6. Cada equipe deve ter pelo menos η·n/s ativos (balanceamento mínimo)
 
----
+## Algoritmo VNS Implementado
 
-## 🧠 **Algoritmo VNS**
+### Estruturas de Vizinhança
+1. **Troca ativo de base**: Move um equipamento de uma base para outra
+2. **Troca equipe de base**: Move uma equipe inteira de uma base para outra
+3. **Troca ativo entre equipes**: Troca equipamentos entre equipes da mesma base
 
-### **Estrutura de Vizinhança**
+### Heurística Construtiva Inteligente
+1. **Ordenação por centralidade**: Calcula distância média de cada base para todos os ativos
+2. **Alocação estratégica**: Distribui equipes nas bases mais centrais
+3. **Atribuição otimizada**: Cada ativo vai para a base mais próxima que tenha equipe
+4. **Balanceamento**: Distribui ativos entre equipes de forma equilibrada
 
-| Estrutura | Descrição | Objetivo |
-|-----------|-----------|----------|
-| **Troca Ativo de Base** | Move equipamento entre bases | Reduzir distâncias |
-| **Troca Equipe de Base** | Move equipe entre bases | Reorganizar cobertura |
-| **Troca Ativo Entre Equipes** | Troca equipamentos na mesma base | Balancear carga de trabalho |
+### Busca Local Especializada
+- **Para f1**: Foca em reduzir distâncias movendo ativos para bases mais próximas
+- **Para f2**: Consolida equipes removendo as que têm poucos ativos
 
-### **Heurística Construtiva**
+### Operador Shake Adaptativo
+- **Intensidade variável**: Aumenta conforme iterações sem melhoria
+- **Perturbação inteligente**: Move ativos considerando proximidade geográfica
+- **Diversificação**: Para f2, move equipes inteiras para bases vazias
 
-```mermaid
-graph TD
-    A[Início] --> B[Alocar equipes nas bases centrais]
-    B --> C[Atribuir ativos às bases mais próximas]
-    C --> D[Distribuir ativos entre equipes]
-    D --> E[Solução inicial gerada]
-```
+## Como Usar
 
-### **Estratégia de Refinamento**
-
-- **Busca Local Especializada** para F1 e F2
-- **Shake Adaptativo** com intensidade variável
-- **Critério de Aceitação** apenas soluções melhores
-- **Mecanismo de Restart** para evitar estagnação
-
----
-
-## 🚀 **Instalação e Execução**
-
-### **Pré-requisitos**
-
+### Instalação Rápida
 ```bash
-pip install numpy matplotlib networkx pandas
+# Clone o repositório
+git clone [https://github.com/felcoslop/TC1-TD-UFMG]
+
+# Instale as dependências
+pip install -r requirements.txt
 ```
 
-### **Estrutura do Projeto**
-
-```
-TC1-final/
-├── 📁 src/
-│   ├── 🐍 monitoramento_ativos_base.py         # Classe principal e inicialização
-│   ├── 🐍 dados.py                             # Carregamento e processamento de dados
-│   ├── 🐍 solucoes_iniciais.py                 # Geração de soluções iniciais e heurísticas
-│   ├── 🐍 funcoes_objetivo.py                  # Funções objetivo e verificação de restrições
-│   ├── 🐍 busca_local.py                       # Estruturas de vizinhança e busca local
-│   ├── 🐍 algoritmos_vns.py                    # Algoritmos VNS e otimização
-│   ├── 🐍 visualizacao.py                      # Visualização e plotagem
-│   ├── 🐍 relatorios.py                        # Relatórios e análise
-│   └── 🐍 __init__.py                          # Inicialização do pacote
-├── 📁 data/
-│   └── 📊 probdata.csv                         # Dados do problema
-├── 📁 resultados/
-│   ├── 📁 graficos/                            # Gráficos gerados
-│   └── 📁 relatorios/                          # Relatórios detalhados
-└── 📄 README.md                                # Este arquivo
-```
-
-### **Execução do Sistema Modularizado**
-
+### Execução Simples
 ```bash
-cd TC1-final
+# Execute o algoritmo completo
 python src/monitoramento_ativos_base.py
 ```
 
-### **Execução de Módulos Específicos**
-
-```bash
-# Para testar apenas o carregamento de dados
-python -c "from src.dados import DadosProcessor; dp = DadosProcessor('data/probdata.csv'); print(f'Dados carregados: {dp.n_ativos} ativos')"
-
-# Para testar apenas as funções objetivo
-python -c "from src.funcoes_objetivo import FuncoesObjetivo; print('Módulo de funções objetivo carregado')"
+### Estrutura do Projeto
+```
+TC1-TD-UFMG-main/
+├── src/                                    # Código fonte
+│   ├── monitoramento_ativos_base.py       # Arquivo principal
+│   ├── dados.py                           # Carrega dados do CSV
+│   ├── funcoes_objetivo.py                # Calcula f1, f2 e verifica restrições
+│   ├── solucoes_iniciais.py               # Gera soluções iniciais
+│   ├── busca_local.py                     # Estruturas de vizinhança
+│   ├── algoritmos_vns.py                  # Algoritmo VNS
+│   ├── visualizacao.py                    # Gera gráficos
+│   └── relatorios.py                      # Gera relatórios
+├── data/
+│   └── probdata.csv                       # Dados do problema (125 ativos)
+├── resultados/
+│   ├── graficos/                          # Gráficos gerados
+│   └── relatorios/                        # Relatórios em texto
+├── latex/
+│   └── bare_conf.tex                      # Documento LaTeX da entrega
+└── requirements.txt                       # Dependências Python
 ```
 
----
+## Resultados Gerados
 
-## 📊 **Saídas Geradas**
+### Gráficos de Análise
+- **`analise_convergencia_completa.png`**: Curvas de convergência das 5 execuções
+- **`melhor_solucao_f1.png`**: Rede otimizada para minimizar distância
+- **`melhor_solucao_f2.png`**: Rede otimizada para minimizar número de equipes
+- **`mapa_geografico_f1.png`**: Mapa geográfico da solução f1
+- **`mapa_geografico_f2.png`**: Mapa geográfico da solução f2
+- **`analise_detalhada_completa.png`**: Análise comparativa completa
 
-### **Gráficos de Análise**
+### Relatórios Detalhados
+- **`relatorio_entrega_1.txt`**: Estatísticas completas (min, max, média, desvio padrão)
 
-| Arquivo | Descrição | Conteúdo |
-|---------|-----------|----------|
-| `analise_convergencia_completa.png` | Curvas de convergência | 5 execuções sobrepostas para F1 e F2 |
-| `melhor_solucao_f1.png` | Rede otimizada para F1 | Distribuição focada em distância mínima |
-| `melhor_solucao_f2.png` | Rede otimizada para F2 | Distribuição focada em balanceamento |
+## Interpretação dos Resultados
 
-### **Relatórios**
-
-- **`relatorio_entrega_1.txt`**: Estatísticas completas (min, max, média, desvio)
-- **Console**: Log detalhado da execução em tempo real
-
----
-
-## 🎯 **Características Técnicas**
-
-### **Algoritmo VNS Implementado**
-
-- ✅ **Exploração Diversificada**: Múltiplas estruturas de vizinhança
-- ✅ **Busca Local Inteligente**: Estratégias específicas para cada função objetivo
-- ✅ **Adaptabilidade**: Intensidade de perturbação ajustável
-- ✅ **Robustez**: Mecanismo de restart para evitar estagnação
-
-### **Otimizações Específicas**
-
-**Para F1 (Distância):**
-- Foco em redução de distâncias totais
-- Movimentação estratégica de ativos
-- Análise de proximidade espacial
-
-**Para F2 (Diferença entre Equipes):**
-- Consolidação de equipes
-- Remoção de equipes vazias
-- Balanceamento de carga de trabalho
-
----
-
-## 📈 **Resultados Esperados**
-
-### **Função F1 (Distância Total)**
-- **Objetivo**: Minimizar soma de distâncias
+### Função f1 (Distância Total)
+- **Objetivo**: Minimizar soma de todas as distâncias
 - **Unidade**: Quilômetros
+- **Melhor resultado**: 1.239,26 km
 - **Interpretação**: Menor valor = maior eficiência espacial
 
-### **Função F2 (Diferença entre Equipes)**
-- **Objetivo**: Minimizar diferença entre equipes
-- **Unidade**: Diferença em número de ativos
-- **Interpretação**: Menor valor = maior balanceamento
+### Função f2 (Número de Equipes)
+- **Objetivo**: Minimizar número de equipes utilizadas
+- **Unidade**: Quantidade de equipes
+- **Melhor resultado**: 1 equipe
+- **Interpretação**: Menor valor = menor custo operacional
 
-### **Conflito Identificado**
-As funções F1 e F2 são **conflitantes**:
-- **F1 baixo** → F2 alto (muitas equipes próximas, distâncias pequenas)
-- **F2 baixo** → F1 alto (poucas equipes, distâncias grandes)
+### Conflito Confirmado
+- **f1 baixo** → f2 alto (muitas equipes próximas, distâncias pequenas)
+- **f2 baixo** → f1 alto (poucas equipes, distâncias grandes)
 
----
+## Características Técnicas
 
-</div>
+### Configuração Experimental
+- **5 execuções** independentes para cada função objetivo
+- **500 iterações** por execução
+- **Busca local especializada** para cada função
+- **Shake adaptativo** com intensidade variável (0.3 a 0.8)
+- **Verificação completa** de todas as restrições
+
+### Parâmetros do VNS
+- Intensidade mínima do shake: 0.3
+- Intensidade máxima do shake: 0.8
+- Número máximo de perturbações: 60 ativos
+- Critério de parada: 500 iterações ou convergência
+
+### Alunos
+- Felipe Costa Lopes
+- Luiz Felipe dos Santos Alves  
+- Stephanie Pereira Barbosa
+
+## Referências
+
+- Hansen, P. & Mladenović, N. (2001). Variable neighborhood search: Principles and applications
+- Glover, F. & Kochenberger, G. (2003). Handbook of Metaheuristics
+- Gendreau, M. & Potvin, J.-Y. (2010). Handbook of Metaheuristics, 2nd ed.

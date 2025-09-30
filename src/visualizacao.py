@@ -1,15 +1,10 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Módulo de visualização e plotagem
-para o problema de monitoramento de ativos.
-"""
-
 import numpy as np
 import matplotlib.pyplot as plt
 import networkx as nx
 import seaborn as sns
 from typing import Dict
+from matplotlib.patches import Patch, RegularPolygon
+from matplotlib.lines import Line2D
 
 class Visualizador:
     """
@@ -223,7 +218,17 @@ class Visualizador:
             plt.title(f'Melhor Solução - F1: Minimização da Distância Total\n'
                      f'Valor da Função: {valor_exibicao:.2f} km\n'
                      f'Bases Ativas: {len(bases_ativas)}', fontsize=12, fontweight='bold')
-        plt.legend()
+        # Cria legenda personalizada - copia exatamente como está no gráfico
+        legend_elements = [
+            Line2D([0], [0], marker='o', color='w', markerfacecolor='blue', markersize=8, label='Ativos'),
+            Line2D([0], [0], marker='p', color='w', markerfacecolor='white', markeredgecolor='green', 
+                   markersize=12, markeredgewidth=1, label='Bases Disponíveis'),
+            Line2D([0], [0], marker='p', color='w', markerfacecolor='white', markeredgecolor='red', 
+                   markersize=12, markeredgewidth=3, label='Bases Ocupadas'),
+            Line2D([0], [0], marker='+', color='k', markersize=12, label='Bases Ocupadas')
+        ]
+        
+        plt.legend(handles=legend_elements, loc='upper right')
         plt.axis('off')
         plt.tight_layout()
         plt.savefig(f'resultados/graficos/melhor_solucao_{resultado["funcao_objetivo"]}.png', 

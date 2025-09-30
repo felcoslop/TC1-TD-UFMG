@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-"""
-Configurações do projeto TC1 - Monitoramento de Ativos
-"""
+# Configurações do projeto TC1 - Monitoramento de Ativos
 
 # Configurações do problema
 PROBLEMA_CONFIG = {

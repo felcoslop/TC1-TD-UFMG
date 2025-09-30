@@ -1,23 +1,11 @@
-"""
-Módulo de algoritmos VNS e otimização
-para o problema de monitoramento de ativos.
-"""
-
 import numpy as np
 from typing import Dict, Tuple
 
 class AlgoritmoVNS:
-    """
-    Classe responsável pelos algoritmos VNS e otimização.
-    """
+    # Classe que implementa o algoritmo VNS (Variable Neighborhood Search) para otimização
     
     def __init__(self, monitoramento):
-        """
-        Inicializa o algoritmo VNS.
-        
-        Args:
-            monitoramento: Instância da classe principal
-        """
+        # Pega os dados do problema e as classes necessárias
         self.monitoramento = monitoramento
         self.n_ativos = monitoramento.n_ativos
         self.m_bases = monitoramento.m_bases
@@ -54,13 +42,6 @@ class AlgoritmoVNS:
             melhor_valor = self.funcoes_objetivo.calcular_f2(h_ik, y_jk)
         
         print(f"    Valor inicial: {melhor_valor:.2f}")
-        
-        # PULA busca local inicial para permitir mais diversificação
-        # if funcao_objetivo == 'f2':
-        #     x_ij, y_jk, h_ik, melhor_valor = self.busca_local.busca_local_simples(x_ij, y_jk, h_ik, funcao_objetivo)
-        # else:
-        #     x_ij, y_jk, h_ik, melhor_valor = self.busca_local.busca_local_simples(x_ij, y_jk, h_ik, funcao_objetivo)
-        print(f"    Valor inicial mantido: {melhor_valor:.2f}")
         
         historico = [melhor_valor]
         iteracoes_sem_melhoria = 0
@@ -105,7 +86,7 @@ class AlgoritmoVNS:
                 x_ij, y_jk, h_ik = x_viz, y_viz, h_viz
                 melhor_valor = valor_viz
                 iteracoes_sem_melhoria = 0
-                print(f"    ✓ Melhoria encontrada: {valor_viz:.2f}")
+                print(f"    Melhoria encontrada: {valor_viz:.2f}")
             else:
                 iteracoes_sem_melhoria += 1
             

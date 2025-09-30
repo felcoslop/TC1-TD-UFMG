@@ -1,10 +1,3 @@
-"""
-Trabalho Computacional - Teoria da Decisão
-Monitoramento de Ativos - Classe Base
-
-Este módulo contém a classe principal e inicialização do sistema.
-"""
-
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -38,18 +31,10 @@ except ImportError:
     from relatorios import GeradorRelatorios
 
 class MonitoramentoAtivosCompleto:
-    """
-    Implementação completa do problema de monitoramento de ativos
-    conforme orientações do trabalho computacional.
-    """
+    # Classe principal que coordena todo o problema de monitoramento de ativos
     
     def __init__(self, arquivo_dados: str):
-        """
-        Inicializa o problema com os dados.
-        
-        Args:
-            arquivo_dados: Caminho para o arquivo CSV com os dados
-        """
+        # Inicializa o problema carregando os dados e criando todas as classes necessárias
         # Inicializa processador de dados
         self.dados_processor = DadosProcessor(arquivo_dados)
         self.dados = self.dados_processor.dados
