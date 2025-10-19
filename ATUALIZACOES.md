@@ -1,7 +1,6 @@
 # ATUALIZAÇÕES DA PARTE 1 - OTIMIZAÇÃO MONO-OBJETIVO
 
 **Trabalho Computacional - Monitoramento de Ativos**  
-**Data:** Outubro 2024  
 **Versão:** 2.2 - Critério de parada ultra-otimizado (5 iterações)
 
 ---
@@ -455,7 +454,7 @@ Iniciando GVNS para f1...
 
 ---
 
-### 6. **CRITÉRIO DE PARADA OTIMIZADO** [NOVO - Out 2024]
+### 6. **CRITÉRIO DE PARADA OTIMIZADO** [NOVO - ]
 
 #### **ANTES:**
 
@@ -522,7 +521,7 @@ VERSÃO 2.2 (5 iterações sem melhoria) [ATUAL]:
 
 ---
 
-### 7. **CONSOLIDAÇÃO AGRESSIVA ENTRE BASES PARA F2** [NOVO - Out 2024]
+### 7. **CONSOLIDAÇÃO AGRESSIVA ENTRE BASES PARA F2** [NOVO - ]
 
 #### **ANTES:**
 
@@ -668,7 +667,7 @@ if self.funcoes_objetivo.verificar_restricoes(x_novo, y_novo, h_novo):
 
 ---
 
-### 8. **SCRIPT ESPECIALIZADO PARA TESTAR F2** [NOVO - Out 2024]
+### 8. **SCRIPT ESPECIALIZADO PARA TESTAR F2** [NOVO - ]
 
 #### **MOTIVAÇÃO:**
 
@@ -850,26 +849,26 @@ parte1/src/
 ```
 parte1/
 ├── src/
-│   ├── busca_local.py           [MODIFICADO - Out 2024]
+│   ├── busca_local.py           [MODIFICADO ]
 │   │   └── ~ consolidate_equipes()    ← MELHORADO com 2 estratégias:
 │   │                                     - Estratégia 1: mesma base (preserva f1)
 │   │                                     - Estratégia 2: entre bases (agressivo)
 │   │
-│   └── algoritmos_vns.py        [MODIFICADO - Out 2024]
+│   └── algoritmos_vns.py        [MODIFICADO ]
 │       └── ~ otimizacao_mono_objetivo() ← max_iter_sem_melhoria: 50 → 10
 │
-├── rodar_f2.py                  [NOVO - Out 2024]
+├── rodar_f2.py                  [NOVO ]
 │   ├── main_f2_only()                ← Executa apenas F2
 │   └── gerar_relatorio_f2()           ← Relatório específico F2
 │
-├── README.md                    [ATUALIZADO - Out 2024]
+├── README.md                    [ATUALIZADO ]
 │   ├── Busca Local Especializada      ← Detalhes consolidate melhorado
 │   ├── Operador Shake Adaptativo      ← 3 intensidades explicadas
 │   ├── Como Usar                      ← Adicionado rodar_f2.py
 │   ├── Estrutura do Projeto           ← Incluído rodar_f2.py
 │   └── Configuração Experimental      ← Atualizado critério parada (10)
 │
-└── ATUALIZACOES_PARTE1.md       [ATUALIZADO - Out 2024]
+└── ATUALIZACOES_PARTE1.md       [ATUALIZADO- ]
     ├── Versão 2.0 → 2.1
     ├── + Seção 6: Critério de Parada Otimizado
     ├── + Seção 7: Consolidação Agressiva Entre Bases
@@ -889,7 +888,7 @@ python rodar.py
 - **Configuração:** 3 execuções × 200 iterações
 - **Gera:** Gráficos + Relatórios completos (F1 e F2)
 
-### **Opção 2: Testar Apenas F2** [NOVO - Out 2024]
+### **Opção 2: Testar Apenas F2** [NOVO]
 ```bash
 cd parte1
 python rodar_f2.py
@@ -971,35 +970,6 @@ resultados_mono = monitoramento.otimizacao_mono_objetivo(n_execucoes=5)
 
 ---
 
-## CHECKLIST DE CORREÇÕES
-
-- [x] **Tournament Selection** implementado para constraint handling
-- [x] **Medida quantitativa de violação** (calcular_violacao)
-- [x] **Vizinhança switch_ativos removida** conforme pedido
-- [x] **VND (Variable Neighborhood Descent)** implementado (Algoritmo 7)
-- [x] **GVNS (General VNS)** implementado (Algoritmo 6)
-- [x] **Loop k com múltiplas intensidades de shake** (0.2, 0.6, 0.8)
-- [x] **NeighborhoodChange com Tournament Selection**
-- [x] **Logs detalhados com flush=True** para output em tempo real
-- [x] **Parada antecipada** (100 iterações sem melhoria)
-- [x] **Configuração otimizada** para execução mais rápida
-- [x] **[NOVO] Critério de parada otimizado** (50 → 10 iterações)
-- [x] **[NOVO] Consolidate com 2 estratégias** (mesma base + entre bases)
-- [x] **[NOVO] F2 converge para 1 equipe** (mínimo teórico alcançado)
-- [x] **[NOVO] Script rodar_f2.py** para testes focados em F2
-
----
-
-## REFERÊNCIAS
-
-- **Slides:** `02-ot-restrita.pdf` - Tournament Selection para constraint handling
-- **Notebook:** `4 - ProblemaMochilaBinario-TorneioBinario.ipynb` - Exemplo de Tournament Selection
-- **Algoritmo 6 (GVNS)** dos slides do professor
-- **Algoritmo 7 (VND)** dos slides do professor
-- **Slides:** `05-introducao-td.pdf` - Metaheurísticas VNS
-
----
-
 ## NOTAS IMPORTANTES
 
 1. **GVNS é mais lento mas mais robusto**
@@ -1051,70 +1021,3 @@ resultados_mono = monitoramento.otimizacao_mono_objetivo(n_execucoes=5)
 - Itera pelas vizinhanças em ordem
 - REINICIA quando encontra melhoria
 - Explora completamente cada região
-- Algoritmo 7 dos slides (teoricamente fundamentado)
-
----
-
----
-
-## RESUMO DAS NOVIDADES VERSÃO 2.2 (Out 2024)
-
-### O que mudou?
-
-1. **Critério de Parada Ultra-Otimizado (50 → 10 → 5 iterações)**
-   - **Versão 2.0**: 50 iterações
-   - **Versão 2.1**: 10 iterações (~40% mais rápido)
-   - **Versão 2.2**: **5 iterações** (~60% mais rápido que v2.0) [ATUAL]
-   - F2 converge MUITO rápido (valores discretos)
-   - Mantém qualidade ótima da solução
-
-2. **Consolidate_equipes com 2 Estratégias**
-   - **ANTES**: Só consolidava equipes na mesma base
-   - **DEPOIS**: 
-     - Estratégia 1: Mesma base (preserva F1)
-     - Estratégia 2: Entre bases diferentes (minimiza F2 agressivamente)
-   - **Resultado**: F2 agora converge para **1 equipe** (mínimo teórico!)
-
-3. **Script rodar_f2.py**
-   - Testa apenas F2 rapidamente
-   - Mostra distribuição detalhada por equipe/base
-   - Valida se chegou no mínimo teórico
-   - Gera visualizações e relatório específico
-
-### Por que essas mudanças?
-
-- **F1 já estava ótimo** (distâncias bem otimizadas)
-- **F2 parava em 5-6 equipes** ao invés de 1
-- **Problema identificado**: Consolidate só trabalhava dentro da mesma base
-- **Solução**: Estratégia 2 move ativos entre bases para consolidar equipes
-- **Validação**: Sempre verifica restrições antes de aceitar
-- **Legalidade**: Movimento válido no espaço de busca
-- **Não interfere em F1**: Só é chamado quando `funcao_objetivo == 'f2'`
-
-### Resultados esperados:
-
-```
-F2 ANTES (Versão 2.0):
-- Execução: ~2-3 min cada
-- Resultado típico: 5-6 equipes
-- Total 5 execuções: ~10-15 min
-
-F2 VERSÃO 2.1 (10 iterações):
-- Execução: ~1-2 min cada
-- Resultado típico: 1 equipe (ótimo!)
-- Total 5 execuções: ~5-10 min
-
-F2 VERSÃO 2.2 (5 iterações) [ATUAL]:
-- Execução: ~0.5-1 min cada
-- Resultado típico: 1 equipe (ótimo!)
-- Total 5 execuções: ~2.5-5 min
-
-✅ Mais de 2x mais rápido + Qualidade ótima!
-```
-
----
-
-**Fim do documento**
-
-*Todas as alterações foram implementadas e testadas com sucesso.*
-*Versão 2.1 - Outubro 2024*
